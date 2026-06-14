@@ -23,7 +23,7 @@ from langchain_core.output_parsers import StrOutputParser
 # ─────────────────────────────────────────────
 load_dotenv()
 st.set_page_config(
-    page_title="DocuChat_AT",
+    page_title="DocuChat_AI",
     page_icon="📄",
     layout="wide",
     initial_sidebar_state="expanded"
