@@ -1,12 +1,12 @@
 ---
-title: Document Intelligence RAG Assistant
-emoji: 📄
+title: DocuChat_AI
+emoji: 💻
 colorFrom: blue
-colorTo: green
+colorTo: indigo
 sdk: streamlit
-sdk_version: 1.40.0
+sdk_version: 1.58.0
 app_file: app.py
-python_version: "3.10"
+python_version: '3.10'
 pinned: false
 license: mit
 ---
