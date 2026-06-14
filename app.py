@@ -189,7 +189,7 @@ def load_uploaded_documents(files: list) -> list[Document]:
 
 
 def build_vectorstore(docs: list[Document], chunk_size: int, chunk_overlap: int) -> tuple[FAISS, list[Document]]:
-    splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+    splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
         separators=["\n\n", "\n", ". ", " ", ""],
