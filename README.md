@@ -117,7 +117,7 @@ streamlit run app.py
 
 1. Create a new Hugging Face Space.
 2. Choose Streamlit as the Space SDK.
-3. Upload `app.py`, `README.md`, `requirements.txt`, `Dockerfile`, `.gitattributes`, and the `assets/` folder.
+3. Upload `app.py`, `README.md`, `requirements.txt`, `runtime.txt`, `.gitattributes`, and the `assets/` folder. `Dockerfile` is included for GitHub/Docker users, but a normal Streamlit Space does not require it.
 4. Add `GROQ_API_KEY` under Space Settings -> Secrets.
 5. Confirm `app.py` is the entry point.
 6. Restart the Space if dependencies are updated.
@@ -149,6 +149,7 @@ The app is designed to run on Hugging Face Spaces CPU. It uses CPU-compatible em
 ├── app.py
 ├── README.md
 ├── requirements.txt
+├── runtime.txt
 ├── Dockerfile
 ├── .gitattributes
 └── assets/
