@@ -135,7 +135,7 @@ def load_documents(files) -> list:
     return docs
 
 def export_chat() -> str:
-    lines = [f"# DocuChat_AT Export — {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"]
+    lines = [f"# DocuChat_AI Export — {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"]
     for m in st.session_state.messages:
         role = "👤 User" if m["role"] == "user" else "🤖 Assistant"
         lines.append(f"**{role}:** {m['content']}\n")
@@ -145,7 +145,7 @@ def export_chat() -> str:
 # SIDEBAR UI
 # ─────────────────────────────────────────────
 with st.sidebar:
-    st.title("📄 DocuChat_AT")
+    st.title("📄 DocuChat_AI")
     
     if st.session_state.vectors:
         st.success("✅ Vector DB Ready", icon="🟢")
@@ -306,7 +306,7 @@ if not st.session_state.messages:
     st.markdown(
         """
         <section class="docuchat-hero">
-            <h1>DocuChat_AT (Document Intelligence RAG Assistant)</h1>
+            <h1>DocuChat_AI (Document Intelligence RAG Assistant)</h1>
             <p>Upload documents, generate summaries, and ask grounded questions with source citations.</p>
         </section>
         """,
