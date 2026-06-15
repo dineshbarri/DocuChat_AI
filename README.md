@@ -54,13 +54,10 @@ DocuChat_AI is designed for students, analysts, recruiters, researchers, founder
 ### 1. Premium Home Workspace
 <img src="assets/app_home.png" width="90%" alt="DocuChat_AI home workspace" />
 
-### 2. Document Processing and Indexing
-<img src="assets/document_processing.png" width="90%" alt="Document upload and processing workflow" />
-
-### 3. Chat with Source Citations
+### 2. Chat with Source Citations
 <img src="assets/chat_with_sources.png" width="90%" alt="Document question answering with citations" />
 
-### 4. Summary and Analysis Tools
+### 3. Summary and Analysis Tools
 <img src="assets/summary_tools.png" width="90%" alt="Summary and analysis tabs" />
 
 </div>
