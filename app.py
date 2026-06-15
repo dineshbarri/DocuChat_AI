@@ -23,7 +23,7 @@ from langchain_core.output_parsers import StrOutputParser
 # ─────────────────────────────────────────────
 load_dotenv()
 st.set_page_config(
-    page_title="DocuChat_AI",
+    page_title="DocuChat_AT",
     page_icon="📄",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -32,18 +32,26 @@ st.set_page_config(
 st.markdown(
     """
     <style>
+    .block-container {
+        max-width: 1180px;
+        padding-top: 2.2rem;
+        padding-bottom: 6rem;
+    }
+
     .docuchat-hero {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 1.6rem 1.8rem 1.45rem;
-        margin-bottom: 1.2rem;
-        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+        background:
+            linear-gradient(135deg, rgba(255,255,255,0.98), rgba(239,246,255,0.96)),
+            linear-gradient(90deg, #2563eb, #14b8a6);
+        border: 1px solid #dbeafe;
+        border-radius: 14px;
+        padding: 1.8rem 2rem 1.6rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
     }
 
     .docuchat-hero h1 {
         color: #111827 !important;
-        font-size: 2.1rem;
+        font-size: 2.35rem;
         font-weight: 800;
         line-height: 1.15;
         margin: 0 0 0.75rem;
@@ -54,6 +62,103 @@ st.markdown(
         font-size: 1.08rem;
         line-height: 1.55;
         margin: 0;
+    }
+
+    .hero-kicker {
+        color: #2563eb;
+        font-weight: 800;
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 0.65rem;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.85rem;
+        margin: 1rem 0 1.15rem;
+    }
+
+    .feature-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1rem;
+        min-height: 116px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .feature-card strong {
+        display: block;
+        color: #111827;
+        font-size: 0.98rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .feature-card span {
+        color: #475569;
+        font-size: 0.9rem;
+        line-height: 1.45;
+    }
+
+    .status-strip {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.85rem;
+        margin: 0.6rem 0 1.2rem;
+    }
+
+    .status-tile {
+        background: #0f172a;
+        border: 1px solid #1e293b;
+        border-radius: 10px;
+        padding: 1rem 1.1rem;
+    }
+
+    .status-tile small {
+        display: block;
+        color: #94a3b8;
+        font-size: 0.78rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .status-tile b {
+        color: #f8fafc;
+        font-size: 1.15rem;
+    }
+
+    .section-title {
+        color: #e5e7eb;
+        font-size: 1.12rem;
+        font-weight: 800;
+        margin: 1rem 0 0.4rem;
+    }
+
+    .section-copy {
+        color: #94a3b8;
+        margin: 0 0 0.85rem;
+    }
+
+    div[data-testid="stTabs"] button {
+        font-weight: 700;
+    }
+
+    div.stButton > button {
+        border-radius: 9px;
+        min-height: 2.65rem;
+        font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+        .feature-grid,
+        .status-strip {
+            grid-template-columns: 1fr;
+        }
+
+        .docuchat-hero h1 {
+            font-size: 1.75rem;
+        }
     }
     </style>
     """,
@@ -85,9 +190,30 @@ for key, default in {
     "doc_stats": {},
     "last_file_hash": "",
     "full_raw_text": "", # BUG FIX: Stores text so summary can use it without reloading
+    "pending_query": "",
 }.items():
     if key not in st.session_state:
         st.session_state[key] = default
+
+SAMPLE_QUESTIONS = [
+    "Summarize this document in 6 crisp bullet points.",
+    "What are the most important facts, dates, names, and numbers?",
+    "What questions would a reviewer ask about this document?",
+    "Explain the document like I am new to the topic.",
+    "Find risks, warnings, limitations, or missing information.",
+    "Create an action-item checklist from this document.",
+]
+
+TASK_PROMPTS = {
+    "executive_summary": "Create an executive summary with key points, purpose, conclusions, and recommended next steps.",
+    "key_takeaways": "Extract the top 10 key takeaways from the document and group them by theme.",
+    "important_terms": "List important terms, names, dates, numbers, and definitions from the document.",
+    "action_items": "Find every action item, task, owner, deadline, and dependency mentioned in the document.",
+    "risks": "Analyze risks, gaps, contradictions, assumptions, and possible red flags in the document.",
+    "decisions": "Identify decisions made or decisions needed, then explain the evidence for each.",
+    "study_notes": "Turn this document into study notes with sections, bullet points, and likely exam/interview questions.",
+    "email_brief": "Write a professional email brief summarizing this document for a busy stakeholder.",
+}
 
 # ─────────────────────────────────────────────
 # HELPERS
@@ -135,17 +261,123 @@ def load_documents(files) -> list:
     return docs
 
 def export_chat() -> str:
-    lines = [f"# DocuChat_AI Export — {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"]
+    lines = [f"# DocuChat_AT Export — {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"]
     for m in st.session_state.messages:
         role = "👤 User" if m["role"] == "user" else "🤖 Assistant"
         lines.append(f"**{role}:** {m['content']}\n")
     return "\n".join(lines)
 
+def queue_prompt(prompt: str):
+    st.session_state.pending_query = prompt
+
+def render_prompt_button(label: str, prompt: str, key: str, help_text: str | None = None):
+    st.button(label, key=key, use_container_width=True, help=help_text, on_click=queue_prompt, args=(prompt,))
+
+def render_hero():
+    st.markdown(
+        """
+        <section class="docuchat-hero">
+            <div class="hero-kicker">Document intelligence workspace</div>
+            <h1>DocuChat_AT (Document Intelligence RAG Assistant)</h1>
+            <p>Upload documents, generate summaries, extract insights, and ask grounded questions with source citations.</p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
+def render_status_panel():
+    stats = st.session_state.doc_stats or {}
+    ready_label = "Ready" if st.session_state.vectors else "Upload and process"
+    files_label = str(stats.get("files", 0))
+    chunks_label = str(stats.get("chunks", 0))
+    st.markdown(
+        f"""
+        <div class="status-strip">
+            <div class="status-tile"><small>Knowledge base</small><b>{ready_label}</b></div>
+            <div class="status-tile"><small>Documents loaded</small><b>{files_label}</b></div>
+            <div class="status-tile"><small>Search chunks</small><b>{chunks_label}</b></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+def render_capability_cards():
+    st.markdown(
+        """
+        <div class="feature-grid">
+            <div class="feature-card"><strong>Ask Anything</strong><span>Chat with PDFs, Word files, and text documents using grounded answers.</span></div>
+            <div class="feature-card"><strong>Instant Briefs</strong><span>Generate executive summaries, study notes, and stakeholder-ready updates.</span></div>
+            <div class="feature-card"><strong>Deep Extraction</strong><span>Pull out action items, risks, decisions, dates, names, and definitions.</span></div>
+            <div class="feature-card"><strong>Source Citations</strong><span>Inspect the retrieved document chunks used to answer each question.</span></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+def render_workspace():
+    render_hero()
+    render_status_panel()
+    render_capability_cards()
+
+    st.markdown('<div class="section-title">Document command center</div>', unsafe_allow_html=True)
+    st.markdown('<p class="section-copy">Choose a workflow or start with a suggested prompt. Each button sends a ready-made instruction to the assistant.</p>', unsafe_allow_html=True)
+
+    chat_tab, summary_tab, extract_tab, analyze_tab, deliver_tab = st.tabs([
+        "Chat",
+        "Summaries",
+        "Extract",
+        "Analyze",
+        "Deliverables",
+    ])
+
+    with chat_tab:
+        st.markdown("#### Sample questions")
+        cols = st.columns(2)
+        for index, prompt in enumerate(SAMPLE_QUESTIONS):
+            with cols[index % 2]:
+                render_prompt_button(prompt, prompt, f"sample_{index}")
+
+    with summary_tab:
+        st.markdown("#### Summary workflows")
+        c1, c2 = st.columns(2)
+        with c1:
+            render_prompt_button("Executive summary", TASK_PROMPTS["executive_summary"], "task_exec")
+            render_prompt_button("Top 10 takeaways", TASK_PROMPTS["key_takeaways"], "task_takeaways")
+        with c2:
+            render_prompt_button("Study notes", TASK_PROMPTS["study_notes"], "task_study")
+            render_prompt_button("Email brief", TASK_PROMPTS["email_brief"], "task_email")
+
+    with extract_tab:
+        st.markdown("#### Extraction tools")
+        c1, c2 = st.columns(2)
+        with c1:
+            render_prompt_button("Terms, dates, names", TASK_PROMPTS["important_terms"], "task_terms")
+        with c2:
+            render_prompt_button("Action items", TASK_PROMPTS["action_items"], "task_actions")
+
+    with analyze_tab:
+        st.markdown("#### Critical analysis")
+        c1, c2 = st.columns(2)
+        with c1:
+            render_prompt_button("Risks and gaps", TASK_PROMPTS["risks"], "task_risks")
+        with c2:
+            render_prompt_button("Decisions needed", TASK_PROMPTS["decisions"], "task_decisions")
+
+    with deliver_tab:
+        st.markdown("#### Ready-to-use outputs")
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            render_prompt_button("Meeting notes", "Create concise meeting notes from this document with agenda, key discussion points, decisions, and follow-ups.", "task_meeting")
+        with c2:
+            render_prompt_button("Presentation outline", "Create a polished presentation outline from this document with slide titles and bullet points.", "task_presentation")
+        with c3:
+            render_prompt_button("FAQ", "Create a useful FAQ from this document with clear answers grounded in the content.", "task_faq")
+
 # ─────────────────────────────────────────────
 # SIDEBAR UI
 # ─────────────────────────────────────────────
 with st.sidebar:
-    st.title("📄 DocuChat_AI")
+    st.title("📄 DocuChat_AT")
     
     if st.session_state.vectors:
         st.success("✅ Vector DB Ready", icon="🟢")
@@ -301,17 +533,7 @@ llm = ChatGroq(
     max_retries=3 # Handles API rate limits automatically
 )
 
-# Welcome Screen
-if not st.session_state.messages:
-    st.markdown(
-        """
-        <section class="docuchat-hero">
-            <h1>DocuChat_AI (Document Intelligence RAG Assistant)</h1>
-            <p>Upload documents, generate summaries, and ask grounded questions with source citations.</p>
-        </section>
-        """,
-        unsafe_allow_html=True,
-    )
+render_workspace()
 
 # Render Chat
 for msg in st.session_state.messages:
@@ -319,7 +541,14 @@ for msg in st.session_state.messages:
         st.markdown(msg["content"])
 
 # Chat Input
-if user_query := st.chat_input("Ask about your documents…"):
+pending_query = st.session_state.get("pending_query", "")
+if pending_query:
+    user_query = pending_query
+    st.session_state.pending_query = ""
+else:
+    user_query = st.chat_input("Ask about your documents...")
+
+if user_query:
     st.session_state.messages.append({"role": "user", "content": user_query})
     with st.chat_message("user"):
         st.markdown(user_query)
