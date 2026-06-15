@@ -49,6 +49,13 @@ st.markdown(
         box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
     }
 
+    .hero-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 290px;
+        gap: 1.2rem;
+        align-items: start;
+    }
+
     .docuchat-hero h1 {
         color: #111827 !important;
         font-size: 2.35rem;
@@ -71,6 +78,62 @@ st.markdown(
         letter-spacing: 0.08em;
         text-transform: uppercase;
         margin-bottom: 0.65rem;
+    }
+
+    .signature-card {
+        background: #0f172a;
+        border: 1px solid rgba(148, 163, 184, 0.32);
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.18);
+    }
+
+    .signature-card small {
+        color: #93c5fd;
+        display: block;
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 0.35rem;
+    }
+
+    .signature-card strong {
+        color: #ffffff;
+        display: block;
+        font-size: 1.05rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .signature-card p {
+        color: #cbd5e1 !important;
+        font-size: 0.84rem;
+        line-height: 1.45;
+        margin: 0 0 0.75rem;
+    }
+
+    .signature-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.45rem;
+    }
+
+    .signature-links a {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 8px;
+        color: #f8fafc !important;
+        font-size: 0.82rem;
+        font-weight: 700;
+        padding: 0.5rem 0.55rem;
+        text-align: center;
+        text-decoration: none !important;
+    }
+
+    .signature-links a:hover {
+        background: #2563eb;
+        border-color: #60a5fa;
+        color: #ffffff !important;
     }
 
     .feature-grid {
@@ -151,6 +214,10 @@ st.markdown(
     }
 
     @media (max-width: 900px) {
+        .hero-layout {
+            grid-template-columns: 1fr;
+        }
+
         .feature-grid,
         .status-strip {
             grid-template-columns: 1fr;
@@ -277,9 +344,24 @@ def render_hero():
     st.markdown(
         """
         <section class="docuchat-hero">
-            <div class="hero-kicker">Document intelligence workspace</div>
-            <h1>DocuChat_AI (Document Intelligence RAG Assistant)</h1>
-            <p>Upload documents, generate summaries, extract insights, and ask grounded questions with source citations.</p>
+            <div class="hero-layout">
+                <div>
+                    <div class="hero-kicker">Document intelligence workspace</div>
+                    <h1>DocuChat_AI (Document Intelligence RAG Assistant)</h1>
+                    <p>Upload documents, generate summaries, extract insights, and ask grounded questions with source citations.</p>
+                </div>
+                <aside class="signature-card">
+                    <small>Built by</small>
+                    <strong>Dinesh Barri</strong>
+                    <p>AI document assistant built for fast research, review, and knowledge extraction.</p>
+                    <div class="signature-links">
+                        <a href="https://github.com/dineshbarri" target="_blank">GitHub</a>
+                        <a href="https://www.linkedin.com/in/dinesh-barri-7654b010b/" target="_blank">LinkedIn</a>
+                        <a href="https://dineshbarri.dev" target="_blank">Portfolio</a>
+                        <a href="mailto:dineshbarri1997@gmail.com">Email</a>
+                    </div>
+                </aside>
+            </div>
         </section>
         """,
         unsafe_allow_html=True,
