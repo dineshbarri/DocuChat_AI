@@ -17,7 +17,7 @@ Upload documents, generate summaries, and ask grounded questions using Retrieval
 
 ## Demo
 
-[Live Demo](YOUR_HUGGING_FACE_SPACE_URL)
+[Live Demo](https://huggingface.co/spaces/dineshb/DocuChat_AI)
 
 Screenshots:
 
